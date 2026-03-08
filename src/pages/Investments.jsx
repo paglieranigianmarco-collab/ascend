@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
+import { useLocalStorageData } from '../hooks/useLocalStorageData';
 import './Investments.css';
 
 export default function Investments() {
-    const [investments, setInvestments] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetch('/api/investments')
-            .then(r => r.json())
-            .then(data => { setInvestments(data); setLoading(false); })
-            .catch(() => setLoading(false));
-    }, []);
+    const { data: investments, addItem, updateItem } = useLocalStorageData('investments');
 
     const cryptos = investments.filter(i => i.type === 'crypto');
     const transfers = investments.filter(i => i.type === 'transfer');
+
+    const saveCrypto = (symbol, name, updates) => {
+        const existing = investments.find(i => i.type === 'crypto' && i.symbol === symbol);
+        if (existing) {
+            updateItem(existing.id, updates);
+        } else {
+            addItem({ type: 'crypto', name, symbol, ...updates });
+        }
+    };
 
     return (
         <div className="investments-page">
@@ -33,14 +35,14 @@ export default function Investments() {
                         name="Ethereum"
                         logo="⟠"
                         data={cryptos.find(c => c.symbol === 'ETH')}
-                        onSave={(updates) => saveCrypto('ETH', 'Ethereum', updates, investments, setInvestments)}
+                        onSave={(updates) => saveCrypto('ETH', 'Ethereum', updates)}
                     />
                     <CryptoCard
                         symbol="PLS"
                         name="Pulsechain"
                         logo="💜"
                         data={cryptos.find(c => c.symbol === 'PLS')}
-                        onSave={(updates) => saveCrypto('PLS', 'Pulsechain', updates, investments, setInvestments)}
+                        onSave={(updates) => saveCrypto('PLS', 'Pulsechain', updates)}
                     />
                 </div>
             </section>
@@ -50,37 +52,10 @@ export default function Investments() {
                 <div className="section-header">
                     <h2>📊 Stock Tracker – Fiat Transfers</h2>
                 </div>
-                <StockTracker transfers={transfers} setInvestments={setInvestments} />
+                <StockTracker transfers={transfers} addItem={addItem} />
             </section>
         </div>
     );
-}
-
-/* ── Save helper ────────────────────────────────────────────── */
-
-async function saveCrypto(symbol, name, updates, investments, setInvestments) {
-    const existing = investments.find(i => i.type === 'crypto' && i.symbol === symbol);
-    try {
-        let res;
-        if (existing) {
-            res = await fetch(`/api/investments/${existing.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updates),
-            });
-        } else {
-            res = await fetch('/api/investments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: 'crypto', name, symbol, ...updates }),
-            });
-        }
-        const saved = await res.json();
-        setInvestments(prev => {
-            const without = prev.filter(i => !(i.type === 'crypto' && i.symbol === symbol));
-            return [...without, saved];
-        });
-    } catch (err) { console.error(err); }
 }
 
 /* ── Crypto Card ────────────────────────────────────────────── */
@@ -170,41 +145,25 @@ function CryptoCard({ symbol, name, logo, data, onSave }) {
 
 /* ── Stock Tracker / Fiat Transfers ────────────────────────── */
 
-function StockTracker({ transfers, setInvestments }) {
+function StockTracker({ transfers, addItem }) {
     const [form, setForm] = useState({
-        name: '',
-        amount: '',
-        platform: '',
-        transfer_date: '',
-        notes: '',
+        name: '', amount: '', platform: '', transfer_date: '', notes: '',
     });
-    const [entries, setEntries] = useState(transfers);
 
-    useEffect(() => { setEntries(transfers); }, [transfers]);
-
-    const handleAdd = async (e) => {
+    const handleAdd = (e) => {
         e.preventDefault();
-        try {
-            const res = await fetch('/api/investments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'transfer',
-                    name: form.name,
-                    symbol: '',
-                    quantity: 0,
-                    purchase_price: +form.amount,
-                    current_value: +form.amount,
-                    platform: form.platform,
-                    transfer_date: form.transfer_date,
-                    notes: form.notes,
-                }),
-            });
-            const created = await res.json();
-            setEntries(prev => [created, ...prev]);
-            setInvestments(prev => [...prev, created]);
-            setForm({ name: '', amount: '', platform: '', transfer_date: '', notes: '' });
-        } catch (err) { console.error(err); }
+        addItem({
+            type: 'transfer',
+            name: form.name,
+            symbol: '',
+            quantity: 0,
+            purchase_price: +form.amount,
+            current_value: +form.amount,
+            platform: form.platform,
+            transfer_date: form.transfer_date,
+            notes: form.notes,
+        });
+        setForm({ name: '', amount: '', platform: '', transfer_date: '', notes: '' });
     };
 
     const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR' }).format(n || 0);
@@ -244,7 +203,7 @@ function StockTracker({ transfers, setInvestments }) {
                 </form>
             </div>
 
-            {entries.length > 0 && (
+            {transfers.length > 0 && (
                 <div className="card" style={{ marginTop: 20 }} id="transfer-list-card">
                     <table className="data-table">
                         <thead>
@@ -257,7 +216,7 @@ function StockTracker({ transfers, setInvestments }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {entries.map((t, i) => (
+                            {transfers.map((t, i) => (
                                 <tr key={t.id || i}>
                                     <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{t.name}</td>
                                     <td style={{ fontWeight: 600, color: 'var(--color-billed)' }}>{fmt(t.purchase_price)}</td>

@@ -1,15 +1,22 @@
 {
-  "name": "ascend",
-  "version": "1.0.0",
-  "description": "Personal finance dashboard – track income, taxes, loans & investments",
-  "private": true,
-  "scripts": {
-    "server": "cd server && npm run dev",
-    "client": "cd client && npm run dev",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "install:all": "cd server && npm install && cd ../client && npm install"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2"
-  }
+    "name": "ascend-client",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-router-dom": "^6.28.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.12",
+        "@types/react-dom": "^18.3.1",
+        "@vitejs/plugin-react": "^4.3.4",
+        "vite": "^6.0.0"
+    }
 }

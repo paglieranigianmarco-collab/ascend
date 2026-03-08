@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useLocalStorageData } from '../hooks/useLocalStorageData';
 import './TaxPlanner.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -12,15 +12,7 @@ const DEFAULT_QUARTERS = [
 ];
 
 export default function TaxPlanner() {
-    const [taxes, setTaxes] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetch('/api/taxes')
-            .then(r => r.json())
-            .then(data => { setTaxes(data); setLoading(false); })
-            .catch(() => setLoading(false));
-    }, []);
+    const { data: taxes, addItem, updateItem } = useLocalStorageData('taxes');
 
     const yearTaxes = DEFAULT_QUARTERS.map(q => {
         const existing = taxes.find(t => t.year === CURRENT_YEAR && t.quarter === q.quarter);
@@ -44,25 +36,12 @@ export default function TaxPlanner() {
 
     const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR' }).format(n || 0);
 
-    const saveTax = async (tax, updates) => {
-        const body = { ...tax, ...updates, year: CURRENT_YEAR };
-        try {
-            let res;
-            if (tax.id) {
-                res = await fetch(`/api/taxes/${tax.id}`, {
-                    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates),
-                });
-            } else {
-                res = await fetch('/api/taxes', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
-                });
-            }
-            const saved = await res.json();
-            setTaxes(prev => {
-                const without = prev.filter(t => !(t.year === CURRENT_YEAR && t.quarter === tax.quarter));
-                return [...without, saved];
-            });
-        } catch (err) { console.error(err); }
+    const saveTax = (tax, updates) => {
+        if (tax.id) {
+            updateItem(tax.id, updates);
+        } else {
+            addItem({ ...tax, ...updates, year: CURRENT_YEAR });
+        }
     };
 
     return (

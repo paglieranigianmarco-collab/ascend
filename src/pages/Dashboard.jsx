@@ -1,24 +1,20 @@
 import { useState, useEffect } from 'react';
+import { getDashboardSummary, useLocalStorageData } from '../hooks/useLocalStorageData';
 import './Dashboard.css';
-
-const API = '/api';
 
 export default function Dashboard() {
     const [summary, setSummary] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const loadSummary = () => {
+        setSummary(getDashboardSummary());
+        setLoading(false);
+    };
+
     useEffect(() => {
-        fetch(`${API}/dashboard/summary`)
-            .then(r => r.json())
-            .then(data => { setSummary(data); setLoading(false); })
-            .catch(() => {
-                setSummary({
-                    netWorth: { cryptoValue: 0, stockValue: 0, cashValue: 0, totalLoans: 0, totalTaxes: 0, netWorth: 0 },
-                    recentIncome: [],
-                    upcomingDeadlines: [],
-                });
-                setLoading(false);
-            });
+        loadSummary();
+        window.addEventListener('ascend_data_updated', loadSummary);
+        return () => window.removeEventListener('ascend_data_updated', loadSummary);
     }, []);
 
     const nw = summary?.netWorth || {};
@@ -75,7 +71,7 @@ export default function Dashboard() {
                     <div className="card-header">
                         <h3><span className="icon">💰</span> Cash Flow Tracker</h3>
                     </div>
-                    <CashFlowTracker recentIncome={summary?.recentIncome || []} />
+                    <CashFlowTracker />
                 </div>
 
                 {/* ── Deadline Calendar ── */}
@@ -92,27 +88,17 @@ export default function Dashboard() {
 
 /* ── Cash Flow Tracker ──────────────────────────────────────── */
 
-function CashFlowTracker({ recentIncome }) {
+function CashFlowTracker() {
+    const { data: entries, addItem } = useLocalStorageData('monthly_income');
     const [month, setMonth] = useState('');
     const [gross, setGross] = useState('');
     const [net, setNet] = useState('');
     const [source, setSource] = useState('');
-    const [entries, setEntries] = useState(recentIncome);
 
-    useEffect(() => { setEntries(recentIncome); }, [recentIncome]);
-
-    const handleAdd = async (e) => {
+    const handleAdd = (e) => {
         e.preventDefault();
-        try {
-            const res = await fetch('/api/income', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ month, gross_amount: +gross, net_amount: +net, source }),
-            });
-            const created = await res.json();
-            setEntries(prev => [created, ...prev]);
-            setMonth(''); setGross(''); setNet(''); setSource('');
-        } catch (err) { console.error(err); }
+        addItem({ month, gross_amount: +gross, net_amount: +net, source });
+        setMonth(''); setGross(''); setNet(''); setSource('');
     };
 
     const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR' }).format(n || 0);
