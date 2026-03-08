@@ -5,9 +5,6 @@ export default defineConfig({
     plugins: [react()],
     base: '/ascend/',
     server: {
-        port: 5173,
-        proxy: {
-            '/api': 'http://localhost:3001',
-        },
+        port: 5173
     },
 });
