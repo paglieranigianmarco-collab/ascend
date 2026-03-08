@@ -1,0 +1,125 @@
+/* ── Investments Page Styles ──────────────────────────────────── */
+
+.investments-page {
+    max-width: 960px;
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+/* Crypto Card */
+.crypto-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.crypto-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.crypto-logo {
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+.crypto-identity {
+    flex: 1;
+}
+
+.crypto-identity h3 {
+    font-size: 1.05rem;
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.crypto-symbol {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.crypto-value-display {
+    text-align: right;
+}
+
+.crypto-current-val {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.crypto-pnl {
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.crypto-pnl.positive {
+    color: var(--color-paid);
+}
+
+.crypto-pnl.negative {
+    color: var(--color-danger);
+}
+
+.crypto-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.crypto-fields input {
+    width: 100%;
+}
+
+/* Transfer form */
+.transfer-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.transfer-form .input-row {
+    display: flex;
+    gap: 12px;
+}
+
+.transfer-form .input-row .input-group {
+    flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .crypto-header {
+        flex-wrap: wrap;
+    }
+
+    .crypto-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .transfer-form .input-row {
+        flex-direction: column;
+    }
+}

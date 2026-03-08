@@ -1,0 +1,103 @@
+/* ── Loan Extinguisher Styles ─────────────────────────────────── */
+
+.loan-extinguisher {
+    max-width: 960px;
+}
+
+.loan-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.loan-card .card-header {
+    margin-bottom: 0;
+}
+
+/* Empty state */
+.loan-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.loan-empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.loan-empty-icon {
+    font-size: 2.5rem;
+    opacity: 0.5;
+}
+
+.loan-empty-content h3 {
+    font-family: var(--font-heading);
+    color: var(--text-secondary);
+}
+
+.loan-empty-content p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* Figures */
+.loan-figures {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.loan-figures input {
+    width: 100%;
+}
+
+/* Progress */
+.loan-progress {
+    padding: 4px 0;
+}
+
+.loan-progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Payments */
+.loan-payments {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.loan-payments input {
+    width: 100%;
+}
+
+/* Payoff badge */
+.loan-payoff-badge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-accent);
+    background: rgba(124, 58, 237, 0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.chart-payoff-date {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.chart-payoff-date strong {
+    color: var(--text-accent);
+}

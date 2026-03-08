@@ -1,0 +1,193 @@
+/* ── Dashboard Page Styles ────────────────────────────────────── */
+
+.dashboard {
+    max-width: 960px;
+}
+
+/* Net Worth */
+.net-worth-content {
+    text-align: center;
+    padding: 12px 0;
+}
+
+.net-worth-formula {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 8px;
+    margin-bottom: 28px;
+    font-weight: 500;
+}
+
+.net-worth-breakdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.breakdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+}
+
+.breakdown-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+}
+
+.breakdown-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.positive-item .breakdown-value {
+    color: var(--color-paid);
+}
+
+.negative-item .breakdown-value {
+    color: var(--color-danger);
+}
+
+.breakdown-divider {
+    width: 1px;
+    height: 36px;
+    background: var(--border-subtle);
+}
+
+/* Cash Flow */
+.cash-flow-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.input-row {
+    display: flex;
+    gap: 12px;
+}
+
+.input-row .input-group {
+    flex: 1;
+}
+
+.cash-flow-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cash-flow-entry {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast);
+}
+
+.cash-flow-entry:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.entry-month {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    min-width: 90px;
+}
+
+.entry-source {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.entry-amount {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-paid);
+}
+
+/* Deadline Calendar */
+.deadline-calendar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.deadline-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--border-subtle);
+    transition: all var(--transition-fast);
+}
+
+.deadline-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.deadline-item.urgent {
+    border-left-color: var(--color-danger);
+}
+
+.deadline-icon {
+    font-size: 1.3rem;
+}
+
+.deadline-info {
+    flex: 1;
+}
+
+.deadline-label {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+}
+
+.deadline-date {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.deadline-meta {
+    text-align: right;
+}
+
+.deadline-amount {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+}
+
+.deadline-countdown {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.deadline-countdown.urgent {
+    color: var(--color-danger);
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}

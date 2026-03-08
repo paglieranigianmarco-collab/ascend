@@ -1,0 +1,94 @@
+/* ── Tax Planner Styles ───────────────────────────────────────── */
+
+.tax-planner {
+    max-width: 960px;
+}
+
+/* Progress card */
+.tax-progress-card {
+    margin-bottom: 28px;
+}
+
+.tax-progress-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.progress-bar-container.large {
+    height: 12px;
+    margin-top: 8px;
+}
+
+.tax-progress-pct {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+/* Quarter cards grid */
+.tax-quarters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.tax-quarter-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.quarter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.quarter-header h3 {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+}
+
+.quarter-due {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.quarter-amounts {
+    display: flex;
+    gap: 10px;
+}
+
+.quarter-amounts .input-group {
+    flex: 1;
+}
+
+.quarter-amounts input {
+    width: 100%;
+}
+
+.quarter-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.status-select {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    cursor: pointer;
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.status-select:focus {
+    border-color: var(--accent-start);
+}
