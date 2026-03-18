@@ -10,21 +10,15 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-  }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb {
-    background: #272830;
-    border-radius: 999px;
-  }
+  ::-webkit-scrollbar-thumb { background: #1e2028; border-radius: 999px; }
   ::-webkit-scrollbar-thumb:hover { background: #7c6af5; }
 }
 
 @layer components {
   .card {
-    @apply bg-surface-2 rounded-2xl border border-white/5 shadow-card;
+    @apply bg-surface-2 rounded-2xl border border-white/[0.05] shadow-card;
   }
 
   .card-glass {
@@ -32,51 +26,45 @@
   }
 
   .btn-primary {
-    @apply bg-accent hover:bg-accent-dark text-white font-semibold px-4 py-2 rounded-xl transition-all duration-200 shadow-glow hover:shadow-none text-sm;
+    @apply bg-accent hover:bg-accent-dark text-white font-semibold px-4 py-2 rounded-xl
+           transition-all duration-200 shadow-glow hover:shadow-none text-sm cursor-pointer;
   }
 
   .btn-ghost {
-    @apply bg-white/5 hover:bg-white/10 text-white/80 hover:text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 text-sm;
+    @apply bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-medium px-4 py-2
+           rounded-xl transition-all duration-200 text-sm cursor-pointer;
   }
 
   .btn-danger {
-    @apply bg-red-ladder/10 hover:bg-red-ladder/20 text-red-ladder font-medium px-4 py-2 rounded-xl transition-all duration-200 text-sm;
+    @apply bg-red-ladder/10 hover:bg-red-ladder/20 text-red-ladder font-medium px-4 py-2
+           rounded-xl transition-all duration-200 text-sm cursor-pointer;
   }
 
   .input {
-    @apply bg-surface-3 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/30 transition-all duration-200 w-full;
+    @apply bg-surface-3 border border-white/[0.08] rounded-xl px-3 py-2.5 text-sm text-white
+           placeholder-white/25 focus:outline-none focus:border-accent/50 focus:ring-1
+           focus:ring-accent/20 transition-all duration-200 w-full;
   }
 
   .label {
-    @apply text-xs font-medium text-white/50 uppercase tracking-wider mb-1.5 block;
+    @apply text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1.5 block;
   }
 
   .stat-label {
-    @apply text-xs text-white/40 font-medium uppercase tracking-wider;
+    @apply text-[11px] text-white/40 font-semibold uppercase tracking-wider;
   }
 
   .badge {
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold;
   }
 
-  .badge-green {
-    @apply badge bg-green-ladder/15 text-green-ladder;
-  }
-
-  .badge-amber {
-    @apply badge bg-amber-ladder/15 text-amber-ladder;
-  }
-
-  .badge-red {
-    @apply badge bg-red-ladder/15 text-red-ladder;
-  }
-
-  .badge-purple {
-    @apply badge bg-accent/15 text-accent-light;
-  }
+  .badge-green  { @apply badge bg-green-ladder/15 text-green-ladder; }
+  .badge-amber  { @apply badge bg-amber-ladder/15 text-amber-ladder; }
+  .badge-red    { @apply badge bg-red-ladder/15 text-red-ladder; }
+  .badge-purple { @apply badge bg-accent/15 text-accent-light; }
 }
 
-/* Gradient text utility */
+/* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #a99cf7 0%, #22d3a0 100%);
   -webkit-background-clip: text;
@@ -84,24 +72,25 @@
   background-clip: text;
 }
 
-/* Animated number */
+/* Tabular numbers */
 .number-mono {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum';
 }
 
 /* Progress bar */
-.progress-bar {
-  @apply h-1.5 rounded-full bg-surface-3 overflow-hidden;
-}
-.progress-bar-fill {
-  @apply h-full rounded-full transition-all duration-700;
-}
+.progress-bar      { @apply h-1.5 rounded-full bg-surface-3 overflow-hidden; }
+.progress-bar-fill { @apply h-full rounded-full transition-all duration-700; }
 
-/* Custom recharts tooltip */
+/* Recharts tooltip */
 .recharts-tooltip-wrapper .recharts-default-tooltip {
-  background: #1f2028 !important;
+  background: #1a1b22 !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   border-radius: 12px !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+}
+
+/* Page layout */
+.page-content {
+  @apply p-6 space-y-6 max-w-[1400px];
 }

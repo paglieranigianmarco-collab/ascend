@@ -1,12 +1,11 @@
 // Pure localStorage store — no backend needed.
-// Same interface as the original server API so all pages work unchanged.
 
 const K = {
   income:        'tl_income',
   taxes:         'tl_taxes',
   loans:         'tl_loans',
   loan_payments: 'tl_loan_payments',
-  investments:   'tl_investments',
+  investments:   'tl_investments',  // now stores { id, date, category, amount, platform, notes }
   cash:          'tl_cash',
   settings:      'tl_settings',
   seq:           'tl_seq',
@@ -43,7 +42,7 @@ function nextId(entity) {
   }
 })()
 
-// ─── Loan amortisation (ported from server) ───────────────────────────────────
+// ─── Loan amortisation ────────────────────────────────────────────────────────
 function calcProjection(loan, extraPayment) {
   const monthlyRate = loan.interest_rate / 100 / 12
 
@@ -53,7 +52,7 @@ function calcProjection(loan, extraPayment) {
     while (bal > 0.01 && month < 600) {
       const interest  = monthlyRate > 0 ? bal * monthlyRate : 0
       const payment   = base + extra
-      if (payment <= interest) break // infinite loop guard
+      if (payment <= interest) break
       const principal = Math.min(bal, payment - interest)
       bal = Math.max(0, bal - principal)
       month++
@@ -84,14 +83,47 @@ function calcProjection(loan, extraPayment) {
   }
 }
 
+// ─── Investment helpers ───────────────────────────────────────────────────────
+const INV_CATS = ['stocks', 'btc', 'eth', 'crypto', 'etf']
+
+function computeInvSummary() {
+  const all = load(K.investments)
+  const byCategory = {}
+  for (const cat of INV_CATS) byCategory[cat] = 0
+  const total = all.reduce((s, e) => {
+    const amt = e.amount || 0
+    byCategory[e.category] = (byCategory[e.category] || 0) + amt
+    return s + amt
+  }, 0)
+  const now = new Date().toISOString().slice(0, 7)
+  const thisMonth = all.filter(e => e.date?.startsWith(now)).reduce((s, e) => s + (e.amount || 0), 0)
+  const thisYear  = all.filter(e => e.date?.startsWith(String(new Date().getFullYear()))).reduce((s, e) => s + (e.amount || 0), 0)
+  return { total: round(total), this_month: round(thisMonth), this_year: round(thisYear), by_category: byCategory }
+}
+
+function computeInvMonthly(year) {
+  const all = load(K.investments).filter(e => e.date?.startsWith(String(year)))
+  const months = ['01','02','03','04','05','06','07','08','09','10','11','12']
+  const labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  return months.map((m, i) => {
+    const row = { month: labels[i] }
+    const monthRows = all.filter(e => e.date?.startsWith(`${year}-${m}`))
+    for (const c of INV_CATS) {
+      row[c] = round(monthRows.filter(e => e.category === c).reduce((s, e) => s + (e.amount || 0), 0))
+    }
+    row.total = INV_CATS.reduce((s, c) => s + (row[c] || 0), 0)
+    return row
+  })
+}
+
 // ─── Dashboard computations ───────────────────────────────────────────────────
 function computeNetWorth() {
-  const cash  = load(K.cash).reduce((s, a) => s + a.balance, 0)
-  const invs  = load(K.investments).reduce((s, i) => s + i.quantity * i.current_price, 0)
-  const loans = load(K.loans).reduce((s, l) => s + l.current_balance, 0)
+  const cash    = load(K.cash).reduce((s, a) => s + (a.balance || 0), 0)
+  const invs    = load(K.investments).reduce((s, e) => s + (e.amount || 0), 0)
+  const loans   = load(K.loans).reduce((s, l) => s + l.current_balance, 0)
   const taxLiability = load(K.taxes)
     .filter(t => t.status !== 'paid')
-    .reduce((s, t) => s + Math.max(0, t.estimated_amount - t.paid_amount), 0)
+    .reduce((s, t) => s + Math.max(0, (t.estimated_amount || 0) - (t.paid_amount || 0)), 0)
   const assets      = round(cash + invs)
   const liabilities = round(loans + taxLiability)
   return {
@@ -133,7 +165,7 @@ function computeTaxBuffer(year) {
   const settings  = loadObj(K.settings, { tax_rate:'23', tax_buffer_percent:'30' })
   const taxRate   = parseFloat(settings.tax_rate || 23)
   const bufferPct = parseFloat(settings.tax_buffer_percent || 30)
-  const paidTotal = load(K.taxes).reduce((s, t) => s + t.paid_amount, 0)
+  const paidTotal = load(K.taxes).reduce((s, t) => s + (t.paid_amount || 0), 0)
   const estimated = round(incomeTotal * taxRate / 100)
   return {
     gross_income: round(incomeTotal), tax_rate: taxRate, buffer_percent: bufferPct,
@@ -198,16 +230,27 @@ export const api = {
   },
   getPayments: (id) => p(load(K.loan_payments).filter(x => x.loan_id == id).sort((a,b) => b.date?.localeCompare(a.date))),
 
-  // Investments
-  getInvestments:   ()         => p(load(K.investments).sort((a,b) => (a.type+a.symbol).localeCompare(b.type+b.symbol))),
-  addInvestment:    (data)     => { const item = { ...data, id: nextId('investments'), created_at: ts(), updated_at: ts() }; save(K.investments, [...load(K.investments), item]); return p({ id: item.id }) },
-  updateInvestment: (id, data) => { save(K.investments, load(K.investments).map(x => x.id == id ? { ...x, ...data, updated_at: ts() } : x)); return p({ ok:true }) },
-  deleteInvestment: (id)       => { save(K.investments, load(K.investments).filter(x => x.id != id)); return p({ ok:true }) },
-  investmentSummary:()         => {
-    const all        = load(K.investments)
-    const totalValue = all.reduce((s,i) => s + i.quantity * i.current_price,  0)
-    const totalCost  = all.reduce((s,i) => s + i.quantity * i.avg_buy_price,  0)
-    const pnl        = totalValue - totalCost
-    return p({ total_value: round(totalValue), total_cost: round(totalCost), total_pnl: round(pnl), total_pnl_pct: totalCost > 0 ? round(pnl/totalCost*100) : 0 })
+  // Investments — simple category + amount entries (no price tracking)
+  getInvEntries: (params = {}) => {
+    let rows = load(K.investments)
+    if (params.year && params.month) rows = rows.filter(r => r.date?.startsWith(`${params.year}-${String(params.month).padStart(2,'0')}`))
+    else if (params.year) rows = rows.filter(r => r.date?.startsWith(String(params.year)))
+    if (params.category) rows = rows.filter(r => r.category === params.category)
+    return p(rows.sort((a, b) => b.date?.localeCompare(a.date)))
   },
+  addInvEntry: (data) => {
+    const item = { ...data, id: nextId('investments'), created_at: ts() }
+    save(K.investments, [...load(K.investments), item])
+    return p({ id: item.id })
+  },
+  updateInvEntry: (id, data) => {
+    save(K.investments, load(K.investments).map(x => x.id == id ? { ...x, ...data } : x))
+    return p({ ok: true })
+  },
+  deleteInvEntry: (id) => {
+    save(K.investments, load(K.investments).filter(x => x.id != id))
+    return p({ ok: true })
+  },
+  invSummary: () => p(computeInvSummary()),
+  invMonthly: (year) => p(computeInvMonthly(year)),
 }
